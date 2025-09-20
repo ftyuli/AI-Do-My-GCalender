@@ -109,8 +109,13 @@ def read_csv():
                                           description, start_dt.isoformat(),
                                           end_dt.isoformat())
                 elif action == "task":
-                    due_dt_local = datetime.strptime(end, "%Y-%m-%d %H:%M").replace(tzinfo=local_zone)
-                    due_dt_utc   = due_dt_local.astimezone(ZoneInfo("UTC"))
+                    if end:
+                        due_dt_local = datetime.strptime(end, "%Y-%m-%d %H:%M").replace(tzinfo=local_zone)
+                    elif start:
+                        due_dt_local = datetime.strptime(start, "%Y-%m-%d %H:%M").replace(tzinfo=local_zone)
+                    else:
+                        continue
+                    due_dt_utc = due_dt_local.astimezone(ZoneInfo("UTC"))
                     create_task(tasks_service, title, description, due_dt_utc.isoformat())
                 else:
                     print(f"Unknown action type: {action}")

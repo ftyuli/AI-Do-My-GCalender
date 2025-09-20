@@ -1,5 +1,5 @@
 # Ai-Do-My-GCalender
-Have you hating doing your GCalendar and Tasks from a schedule or syliabus
+Have you hating doing your GCalendar and Tasks from a schedule or syliabus?
 Well you come to the right place.
 
 Get AI To do it for you!

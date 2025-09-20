@@ -92,20 +92,22 @@ def read_csv():
         full_path = os.path.join('imports', import_file)
         with open(full_path, newline="", encoding="utf-8") as f:
             reader = csv.DictReader(f)
+            #next(reader)
+            
             for row in reader:
-                title       = row["title"]
-                location    = row.get("location", "")
-                description = row.get("description", "")
-                start       = row["start"]
-                end         = row["end"]
-                action      = row["action"].strip().lower()
+                title = row["title"]
+                location = row["location"]
+                description = row["description"]
+                start = row["start"]
+                end = row["end"]
+                action = row["action"].strip().lower()
 
                 if action == "event":
                     start_dt = datetime.strptime(start, "%Y-%m-%d %H:%M").replace(tzinfo=local_zone)
                     end_dt   = datetime.strptime(end,   "%Y-%m-%d %H:%M").replace(tzinfo=local_zone)
                     create_calendar_event(calendar_service, title, location,
                                           description, start_dt.isoformat(),
-                                          end_dt.isoformat(), local_zone)
+                                          end_dt.isoformat())
                 elif action == "task":
                     due_dt_local = datetime.strptime(end, "%Y-%m-%d %H:%M").replace(tzinfo=local_zone)
                     due_dt_utc   = due_dt_local.astimezone(ZoneInfo("UTC"))
@@ -139,7 +141,7 @@ def create_calendar_event(service, summary, location, description, start, end):
         'end':   {'dateTime': end, 'timeZone': str(local_zone)}
     }
     created_event = service.events().insert(calendarId='primary', body=event).execute()
-    print(f"Created event {summary} at {location} with the description {description} starting at {start}, ending at {end} {created_event.get('htmlLink')}")
+    print(f"Created event {summary} at {created_event.get('htmlLink')}")
     return
 
 def create_task(service, title, notes, due):
@@ -159,7 +161,7 @@ def create_task(service, title, notes, due):
         'due': due
     }
     created_task = service.tasks().insert(tasklist='@default', body=task).execute()
-    print(f"Created task: {task['title']}, decription: {notes}, due {due}")
+    print(f"Created task: {created_task['title']}, due {due}")
     return
 
 if __name__ == '__main__':

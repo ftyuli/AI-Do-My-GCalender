@@ -17,7 +17,7 @@ SCOPES = [
 def main():
     return
 
-def create_needed_directories():
+def create_directories():
     """_summary_
     """
     if not os.path.isdir('token'):
@@ -51,51 +51,52 @@ def get_services():
     return calendar_service, tasks_service
 
 def read_csv():
+    calendar_service, tasks_service = get_services()
+
     for import_file in os.listdir('/imports'):
         if import_file.lower().endswith(".csv"):
             full_path = os.path.join('/imports', import_file)
             with open(full_path, newline="", encoding="utf-8") as f:
                 reader = csv.DictReader(f)
                 for row in reader:
-                    title = row["title"]
-                    location = row["location"]
+                    title       = row["title"]
+                    location    = row["location"]
                     description = row["description"]
-                    start = row["start"]
-                    end = row["end"]
-                    action = row["action"]
+                    start       = row["start"]
+                    end         = row["end"]
+                    action      = row["action"]
 
                     if action == "event":
-                        print("test")
+                        create_calendar_event(calendar_service, title, location, description, start, end)
                     else:
-                        print("test")
-
-
-                    print(f"Title: {title}, Location: {location}, Description: {description}, Start: {start}, End: {end}")
+                        create_task(tasks_service, title, description, end)
         else:
             print("there is no csv in the imports folder, please put one")
     return
 
-def create_calendar_event(service):
+def create_calendar_event(service, summary, location, description, start, end):
     local_zone = ZoneInfo(tzlocal.get_localzone_name())
 
     event = {
-        'summary': 'Demo Meeting',
-        'location': 'Online',
-        'description': 'Discuss project goals.',
-        'start': {'dateTime': '2025-09-10T15:00:00-06:00', 'timeZone': str(local_zone)},
-        'end':   {'dateTime': '2025-09-10T16:00:00-06:00', 'timeZone': str(local_zone)}
+        'summary': summary,
+        'location': location,
+        'description': description,
+        'start': {'dateTime': start, 'timeZone': str(local_zone)},
+        'end':   {'dateTime': end, 'timeZone': str(local_zone)}
     }
     created_event = service.events().insert(calendarId='primary', body=event).execute()
     print("Created event:", created_event.get('htmlLink'))
+    return
 
-def create_task(service):
+def create_task(service, title, notes, due):
     task = {
-        'title': 'Finish STAT 151 Homework',
-        'notes': 'Complete Module 3 questions',
-        'due': '2025-09-15T23:59:00.000Z'   # UTC in RFC3339 format
+        'title': title,
+        'notes': notes,
+        'due': due
     }
     created_task = service.tasks().insert(tasklist='@default', body=task).execute()
     print("Created task:", created_task['title'])
+    return
 
 if __name__ == '__main__':
     main()

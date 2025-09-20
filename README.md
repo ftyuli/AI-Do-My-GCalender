@@ -6,7 +6,11 @@ Get AI To do it for you!
 
 With an AI prompt that accompanies this Python script, you can convert your schedules and syliabuses into actionable events and tasks in your GCalender/GTasks
 
------
+---
+
+## Features
+
+---
 
 ## Setup 
 uhhhh im to tired to finish writing this rn, ima go kill myself real quick 

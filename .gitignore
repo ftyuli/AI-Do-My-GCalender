@@ -1,4 +1,6 @@
 venv/
 token/token.json
 credentials/credentials.json
+imports/*.csv
+exhausted/*.csv
 __pycache__/

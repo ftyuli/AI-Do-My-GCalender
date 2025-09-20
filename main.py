@@ -1,13 +1,13 @@
 import os.path
 import csv
-import tzlocal
-import shutil
+import tzlocal  # to detect the local system timezone
+import shutil  # for moving processed CSVs to 'exhausted' folder
 from google.auth.transport.requests import Request
 from google.oauth2.credentials import Credentials
 from google_auth_oauthlib.flow import InstalledAppFlow
 from googleapiclient.discovery import build
 from datetime import datetime
-from zoneinfo import ZoneInfo
+from zoneinfo import ZoneInfo  # Python 3.9+ timezone support
 
 # scopes for Calendar & Tasks
 SCOPES = [
@@ -21,7 +21,9 @@ def main():
     calls create_directories() and read_csv(), pretty self explanitory
     functions
     """
+    # ensure necessary folders exist
     create_directories()
+    # process all CSV files and create events/tasks
     read_csv()
     return
 
@@ -31,6 +33,7 @@ def create_directories():
     if they dont exist it creates token/, imports/ and credentials/
     exhausted/ directories in the current working directory
     """
+    # create each directory if it doesn't exist
     if not os.path.isdir('token'):
         os.makedirs('token')
     if not os.path.isdir('imports'):
@@ -55,16 +58,21 @@ def get_services():
     """
     creds = None
     if os.path.exists('token/token.json'):
+        # load existing credentials from file
         creds = Credentials.from_authorized_user_file('token/token.json', SCOPES)
     if not creds or not creds.valid:
+        # refresh token if expired
         if creds and creds.expired and creds.refresh_token:
             creds.refresh(Request())
         else:
+            # start OAuth flow in browser if no valid credentials
             flow = InstalledAppFlow.from_client_secrets_file('credentials/credentials.json', SCOPES)
             creds = flow.run_local_server(port=0)
+        # save credentials for future use
         with open('token/token.json', 'w') as token:
             token.write(creds.to_json())
 
+    # create API service objects
     calendar_service = build('calendar', 'v3', credentials=creds)
     tasks_service = build('tasks', 'v1', credentials=creds)
     return calendar_service, tasks_service
@@ -81,8 +89,10 @@ def read_csv():
     Expects start/end times in "%Y-%m-%d %H:%M" format (local time).
     """
     calendar_service, tasks_service = get_services()
+    # get system's local timezone
     local_zone = ZoneInfo(tzlocal.get_localzone_name())
 
+    # get all CSV files in imports/ folder
     csv_files = [f for f in os.listdir('imports') if f.lower().endswith('.csv')]
     if not csv_files:
         print("No CSV file in 'imports' folder.")
@@ -92,33 +102,38 @@ def read_csv():
         full_path = os.path.join('imports', import_file)
         with open(full_path, newline="", encoding="utf-8") as f:
             reader = csv.DictReader(f)
-            #next(reader)
-            
+            # iterate through each row in CSV
             for row in reader:
                 title = row["title"]
                 location = row["location"]
                 description = row["description"]
                 start = row["start"]
                 end = row["end"]
-                action = row["action"].strip().lower()
+                action = row["action"].strip().lower()  # normalize action string
 
                 if action == "event":
+                    # convert start/end strings to datetime objects with local timezone
                     start_dt = datetime.strptime(start, "%Y-%m-%d %H:%M").replace(tzinfo=local_zone)
                     end_dt   = datetime.strptime(end,   "%Y-%m-%d %H:%M").replace(tzinfo=local_zone)
+                    # create Google Calendar event
                     create_calendar_event(calendar_service, title, location,
                                           description, start_dt.isoformat(),
                                           end_dt.isoformat())
                 elif action == "task":
+                    # determine due date: prefer 'end', fallback to 'start'
                     if end:
                         due_dt_local = datetime.strptime(end, "%Y-%m-%d %H:%M").replace(tzinfo=local_zone)
                     elif start:
                         due_dt_local = datetime.strptime(start, "%Y-%m-%d %H:%M").replace(tzinfo=local_zone)
                     else:
-                        continue
+                        continue  # skip row if no start or end time
+                    # convert local datetime to UTC for Google Tasks API
                     due_dt_utc = due_dt_local.astimezone(ZoneInfo("UTC"))
                     create_task(tasks_service, title, description, due_dt_utc.isoformat())
                 else:
                     print(f"Unknown action type: {action}")
+        
+        # move processed CSV to exhausted/ folder to avoid reprocessing
         shutil.move(full_path, os.path.join('exhausted', import_file))
         print(f"Moved {import_file} to exhausted/")
     return
@@ -136,6 +151,7 @@ def create_calendar_event(service, summary, location, description, start, end):
     
     also prints the shit
     """
+    # local timezone for event
     local_zone = ZoneInfo(tzlocal.get_localzone_name())
 
     event = {
@@ -145,6 +161,7 @@ def create_calendar_event(service, summary, location, description, start, end):
         'start': {'dateTime': start, 'timeZone': str(local_zone)},
         'end':   {'dateTime': end, 'timeZone': str(local_zone)}
     }
+    # insert event into Google Calendar
     created_event = service.events().insert(calendarId='primary', body=event).execute()
     print(f"Created event {summary} at {created_event.get('htmlLink')}")
     return
@@ -163,12 +180,12 @@ def create_task(service, title, notes, due):
     task = {
         'title': title,
         'notes': notes,
-        'due': due
+        'due': due  # UTC ISO datetime required by API
     }
+    # insert task into Google Tasks
     created_task = service.tasks().insert(tasklist='@default', body=task).execute()
     print(f"Created task: {created_task['title']}, due {due}")
     return
 
 if __name__ == '__main__':
     main()
-    

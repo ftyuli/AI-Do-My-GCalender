@@ -146,7 +146,3 @@ Attached file:
 ## License
 
 MIT LICENSE
-<<<<<<< Updated upstream
-=======
-
->>>>>>> Stashed changes

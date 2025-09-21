@@ -1,4 +1,4 @@
-# Ai-Do-My-GCalender
+# AI-Do-My-GCalender
 Have you hating doing your GCalendar and Tasks from a schedule or syliabus?
 Well you come to the right place.
 

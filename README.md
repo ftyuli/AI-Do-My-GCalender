@@ -61,6 +61,12 @@ To allow the script to create events and tasks in your GTasks and GCalender, it 
 
 ## Usage
 
+When you first run the script, it will open a browser to authorize and sign in to your account, storing its token in `token/token.json`.
+
+if you want to change the google account you want events and tasks generated, ensure you remove the `token.json` in `token\`. you can keep ()it if you want to switch between multple accounts, but ensure that you keep it safe.
+
+### Using the Script
+
 1. Place your CSV files in the `imports/` folder.
 2. Run the script:
 
@@ -140,3 +146,7 @@ Attached file:
 ## License
 
 MIT LICENSE
+<<<<<<< Updated upstream
+=======
+
+>>>>>>> Stashed changes

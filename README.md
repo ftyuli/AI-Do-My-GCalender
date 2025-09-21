@@ -6,6 +6,8 @@ Get AI To do it for you!
 
 With an AI prompt that accompanies this Python script, you can convert your schedules and syliabuses into actionable events and tasks in your GCalender/GTasks.
 
+The Script is designed to turn classes and exams (events that usually have a start and end time) into events in GCalender. While turning assignments into tasks (that have due dates) on GTasks.
+
 ---
 
 ## Features

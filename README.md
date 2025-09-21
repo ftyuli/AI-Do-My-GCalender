@@ -65,7 +65,7 @@ To allow the script to create events and tasks in your GTasks and GCalender, it 
 2. Run the script:
 
 ```bash
-python main.py
+python3 main.py
 ```
 
 3. The script will:

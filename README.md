@@ -139,5 +139,4 @@ Attached file:
 
 ## License
 
-???
-
+MIT LICENSE

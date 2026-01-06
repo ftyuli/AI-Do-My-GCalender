@@ -118,16 +118,16 @@ You convert schedules from images or PDFs into structured CSV files.
 
 Instructions:
 1. Extract all schedule information from the attached file.
-2. Use the following case-sensitive CSV columns exactly: 
-   title, location, description, start, end, action
+2. Use the following case-sensitive CSV columns exactly: 
+   title, location, description, start, end, action
 3. Every item MUST have a title. If the original schedule does not provide one, generate a descriptive shorthand title that includes:
-   - Class or course name if applicable
-   - A short description of the task or event  
-   Examples: "STAT 151 Class, read mod 1-2" or "ENGL 102 Class, read Romeo and Juliet"
+   - Class or course name if applicable
+   - A short description of the task or event  
+   Examples: "STAT 151 read mod 1-2" or "ENGL 102 read Romeo and Juliet"
 4. Wrap any text that contains commas in double quotes so the CSV layout remains valid.
 5. Events (such as classes or exams) MUST have both 'start' and 'end' times, including **hours and minutes** in the format HH:MM (24-hour clock). Dates alone are not sufficient.
 6. If an item only has a date but is missing a start or end time, **treat it as a task**, using the date as the 'end' column.
-7. Tasks (such as assignments or deadlines) use the 'end' column for the due date. 
+7. Tasks (such as assignments or deadlines) use the 'end' column for the due date. 
 8. If an item is part of a class, course, or larger context, include that name at the front of the title in the shorthand style.
 9. Ensure all dates and times are in the format YYYY-MM-DD HH:MM (24-hour clock).
 10. If a field is missing in the original schedule and cannot be inferred, leave it empty.
@@ -137,8 +137,10 @@ Instructions:
 Example Output:
 
 title,location,description,start,end,action
-STAT 151 Class, read mod 1-2,Room 204,Read module 1-2,2025-09-22 09:00,2025-09-22 10:00,event
-Laundry Task,,Do laundry,,2025-09-23 14:00,task
+STAT 151 Exam,Room 204,Read module 1-2,2025-09-22 09:00,2025-09-22 10:00,event
+Do Laundry,,Do laundry,,2025-09-23 14:00,task
+
+Additional Notes: ** include aditional notes here **
 
 Attached file:
 ```
